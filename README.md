@@ -89,6 +89,14 @@ The public API is re-exported from [`src/root.zig`](src/root.zig).
 - SIMD geometry: [`src/geometry_simd/`](src/geometry_simd/)
 - Utilities: [`src/utils/`](src/utils/)
 
+## Benchmarks
+
+A small performance test is available at [`src/bench/perf.zig`](src/bench/perf.zig). It times core vector, matrix, and collision operations and prints ns/op and ops/sec for each.
+
+```bash
+zig build bench -Doptimize=ReleaseFast
+```
+
 ## Deeper Docs
 
 - **Live API Documentation**: https://analog-alex.github.io/analog-vectors/ (automatically published on every push to main)
@@ -105,6 +113,7 @@ Contribution guidance, including documentation standards and the docs PR checkli
 - Format with `zig fmt .`
 - Run tests with `zig build test`
 - Build with `zig build`
+- Run benchmarks with `zig build bench -Doptimize=ReleaseFast`
 
 Keep changes small, tested, and aligned with the existing module layout.
 
