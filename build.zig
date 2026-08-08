@@ -53,6 +53,25 @@ pub fn build(b: *std.Build) void {
     const test_step = b.step("test", "Run tests");
     test_step.dependOn(&run_mod_tests.step);
 
+    // Small performance test executable that prints timing metrics for
+    // vector, matrix, and collision operations.
+    const bench_module = b.createModule(.{
+        .root_source_file = b.path("src/bench/perf.zig"),
+        .target = target,
+        .optimize = optimize,
+    });
+    bench_module.addImport("vectors", mod);
+    const bench_exe = b.addExecutable(.{
+        .name = "perf",
+        .root_module = bench_module,
+    });
+    const run_bench = b.addRunArtifact(bench_exe);
+    if (b.args) |args| {
+        run_bench.addArgs(args);
+    }
+    const bench_step = b.step("bench", "Run performance metrics benchmark");
+    bench_step.dependOn(&run_bench.step);
+
     const docs_step = b.step("docs", "Generate and install API documentation");
     const install_docs = b.addInstallDirectory(.{
         .source_dir = mod_tests.getEmittedDocs(),
