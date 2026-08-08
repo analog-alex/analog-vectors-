@@ -83,17 +83,19 @@ pub inline fn getRow(m: Mat4, row: usize) vec4.Vec4 {
 // Matrix Operations
 
 pub fn multiply(lhs: Mat4, rhs: Mat4) Mat4 {
+    const l0: vec4.Vec4 = lhs[0..4].*;
+    const l1: vec4.Vec4 = lhs[4..8].*;
+    const l2: vec4.Vec4 = lhs[8..12].*;
+    const l3: vec4.Vec4 = lhs[12..16].*;
+
     var result: Mat4 = undefined;
-    var col: usize = 0;
-    while (col < 4) : (col += 1) {
-        var row: usize = 0;
-        while (row < 4) : (row += 1) {
-            result[col * 4 + row] =
-                lhs[row] * rhs[col * 4] +
-                lhs[row + 4] * rhs[col * 4 + 1] +
-                lhs[row + 8] * rhs[col * 4 + 2] +
-                lhs[row + 12] * rhs[col * 4 + 3];
-        }
+    inline for (0..4) |c| {
+        const rc = c * 4;
+        const col = vec4.mul(l0, rhs[rc]) +
+            vec4.mul(l1, rhs[rc + 1]) +
+            vec4.mul(l2, rhs[rc + 2]) +
+            vec4.mul(l3, rhs[rc + 3]);
+        result[rc..][0..4].* = col;
     }
     return result;
 }
@@ -201,20 +203,22 @@ pub fn inverse(m: Mat4) ?Mat4 {
 // Vector Transformation
 
 pub fn transformVec3(m: Mat4, v: vec3.Vec3) vec3.Vec3 {
-    return [3]f32{
-        m[0] * v[0] + m[4] * v[1] + m[8] * v[2] + m[12],
-        m[1] * v[0] + m[5] * v[1] + m[9] * v[2] + m[13],
-        m[2] * v[0] + m[6] * v[1] + m[10] * v[2] + m[14],
-    };
+    const c0: vec4.Vec4 = m[0..4].*;
+    const c1: vec4.Vec4 = m[4..8].*;
+    const c2: vec4.Vec4 = m[8..12].*;
+    const c3: vec4.Vec4 = m[12..16].*;
+
+    const result = vec4.mul(c0, v[0]) + vec4.mul(c1, v[1]) + vec4.mul(c2, v[2]) + c3;
+    return [3]f32{ result[0], result[1], result[2] };
 }
 
 pub fn transformVec4(m: Mat4, v: vec4.Vec4) vec4.Vec4 {
-    return vec4.Vec4{
-        m[0] * v[0] + m[4] * v[1] + m[8] * v[2] + m[12] * v[3],
-        m[1] * v[0] + m[5] * v[1] + m[9] * v[2] + m[13] * v[3],
-        m[2] * v[0] + m[6] * v[1] + m[10] * v[2] + m[14] * v[3],
-        m[3] * v[0] + m[7] * v[1] + m[11] * v[2] + m[15] * v[3],
-    };
+    const c0: vec4.Vec4 = m[0..4].*;
+    const c1: vec4.Vec4 = m[4..8].*;
+    const c2: vec4.Vec4 = m[8..12].*;
+    const c3: vec4.Vec4 = m[12..16].*;
+
+    return vec4.mul(c0, v[0]) + vec4.mul(c1, v[1]) + vec4.mul(c2, v[2]) + vec4.mul(c3, v[3]);
 }
 
 // ===============
